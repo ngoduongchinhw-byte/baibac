@@ -2,1809 +2,590 @@
 <html lang="vi">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#0e2219" />
-  <title>Tính tiền 4 người</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23143226'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23c8922a'/%3E%3C/svg%3E" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f4f7f5" />
+  <title>Tính tiền</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%231f6b4a'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23fff'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --ink: #1a1714;
-      --muted: #6d6458;
-      --cream: #f4efe4;
-      --gold: #c8922a;
-      --gold-ink: #1a1408;
-      --win: #0e6b40;
-      --lose: #9d2b22;
+      --ink: #17211c;
+      --muted: #6d7872;
+      --line: #e5eeea;
+      --bg: #f3f6f4;
+      --card: #ffffff;
+      --green: #0e7a48;
+      --green-soft: #e8f6ee;
+      --red: #c2412d;
+      --red-soft: #fdeceb;
+      --shadow: 0 10px 30px rgba(23, 33, 28, 0.06);
     }
-
     * { box-sizing: border-box; }
-
     html, body { margin: 0; }
-
+    [hidden] { display: none !important; }
     body {
       min-height: 100dvh;
       font-family: "Be Vietnam Pro", "Segoe UI", sans-serif;
-      color: var(--cream);
+      color: var(--ink);
       background:
-        radial-gradient(1000px 420px at 50% -10%, rgba(232, 196, 122, 0.16), transparent 60%),
-        linear-gradient(180deg, #173528 0%, #0e2219 42%, #0c1c14 100%);
+        radial-gradient(900px 280px at 50% -80px, #dff3e7, transparent 70%),
+        var(--bg);
+      font-size: 16px;
+      line-height: 1.4;
     }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.22;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.16) 0.6px, transparent 0.6px);
-      background-size: 4px 4px;
-    }
-
-    button, input { font: inherit; }
-
-    button {
-      cursor: pointer;
-      border: none;
-      background: none;
-      color: inherit;
-    }
-
-    :focus-visible {
-      outline: 3px solid #e6c27a;
-      outline-offset: 2px;
-    }
-
-    .sheet-cream :focus-visible { outline-color: #8a6116; }
-
-    .app {
-      position: relative;
-      width: min(1040px, calc(100% - 28px));
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .wrap {
+      width: min(480px, 100%);
       margin: 0 auto;
-      padding: 28px 0 64px;
+      padding: 22px 16px calc(112px + env(safe-area-inset-bottom));
     }
-
-    .top {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: flex-end;
-      margin-bottom: 8px;
-    }
-
-    .eyebrow {
-      margin: 0;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: #e6c27a;
-    }
-
-    h1 {
-      margin: 4px 0 8px;
-      font-size: clamp(40px, 7vw, 60px);
-      line-height: 0.95;
-      letter-spacing: -0.045em;
-    }
-
-    h2 { font-size: 18px; margin: 0; }
-
-    .lede, .example {
-      margin: 0;
-      max-width: 68ch;
-    }
-
-    .lede { color: rgba(244, 239, 228, 0.9); }
-
-    .example {
-      margin: 8px 0 22px;
-      color: rgba(244, 239, 228, 0.68);
-      font-size: 14px;
-    }
-
-    .unit-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 12px;
-      font-weight: 700;
-      color: #e6c27a;
-    }
-
-    .unit-field input {
-      width: 96px;
-      color: var(--cream);
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(244, 239, 228, 0.28);
-      border-radius: 10px;
-      padding: 8px 10px;
-    }
-
-    .layout { display: block; }
-
-    .board-col { margin-bottom: 16px; }
-
-    .hint {
-      margin: 8px 0 12px;
-      color: rgba(244, 239, 228, 0.72);
-      font-size: 13.5px;
-    }
-
-    .board {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .player {
-      background: var(--cream);
-      color: var(--ink);
-      border-radius: 18px;
-      padding: 14px;
-      min-height: 168px;
-      border: 2px solid transparent;
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
-      text-align: left;
-    }
-
-    .player.is-winner {
-      border-color: var(--gold);
-      background: #fff8ea;
-      box-shadow: 0 0 0 4px rgba(200, 146, 42, 0.28), 0 12px 28px rgba(0, 0, 0, 0.2);
-    }
-
-    .player.flash { animation: pop 0.55s ease; }
-
-    @keyframes pop {
-      0% { transform: scale(1); }
-      40% { transform: scale(1.035); }
-      100% { transform: scale(1); }
-    }
-
-    .player-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      flex: none;
-      display: inline-block;
-    }
-
-    .name {
-      width: 100%;
-      border: none;
-      border-bottom: 1px dashed rgba(26, 23, 20, 0.35);
-      background: transparent;
-      color: inherit;
-      font-weight: 700;
-      font-size: 16px;
-      padding: 2px 4px;
-      border-radius: 8px 8px 0 0;
-      position: relative;
-      z-index: 1;
-    }
-
-    .card-tools {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .mini {
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      border-radius: 999px;
-      padding: 4px 8px;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .mini.remove { color: var(--lose); }
-
-    .name:focus { background: rgba(255, 255, 255, 0.72); outline: none; }
-
-    .bal {
-      margin: 10px 0 0;
-      font-size: clamp(28px, 6vw, 40px);
-      font-weight: 700;
-      letter-spacing: -0.04em;
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .bal small {
-      font-size: 14px;
-      font-weight: 650;
-      letter-spacing: 0;
-      margin-left: 2px;
-    }
-
-    .bal-word, .delta, .hint-amt, .empty, .round-sub, .round-kicker {
-      font-size: 13px;
-    }
-
-    .bal-word { margin: 5px 0 0; color: var(--muted); }
-
-    .delta {
-      min-height: 1.2em;
-      margin: 6px 0 0;
-      font-weight: 700;
-      color: #8a6116;
-    }
-
-    .pick {
-      width: 100%;
-      margin-top: 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      padding: 8px 10px;
-      font-weight: 700;
-      color: var(--ink);
-    }
-
-    .is-winner .pick {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--gold-ink);
-    }
-
-    .pos { color: var(--win); }
-    .neg { color: var(--lose); }
-    .zero { color: var(--muted); }
-
-    .sum {
-      margin: 12px 2px 0;
-      font-size: 14px;
-      color: rgba(244, 239, 228, 0.8);
-    }
-
-    .sum.bad { color: #ffb4a8; font-weight: 700; }
-
+    header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+    header h1 { margin: 0; font-size: 28px; letter-spacing: -0.045em; line-height: 1; }
+    .lede { margin: 0; color: var(--muted); font-size: 14px; text-align: right; }
+    h2 { margin: 26px 0 8px; font-size: 15px; font-weight: 650; color: var(--muted); }
     .sheet {
-      border-radius: 22px;
-      padding: 18px;
-      margin-bottom: 14px;
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-
-    .sheet-cream {
-      background: var(--cream);
-      color: var(--ink);
-      border-top: 4px solid var(--gold);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    .row { padding: 14px 14px 12px; border-top: 1px solid var(--line); }
+    .row:first-child { border-top: 0; }
+    .row.win { background: linear-gradient(90deg, var(--green-soft), #fff 42%); }
+    .row.lose { background: linear-gradient(90deg, var(--red-soft), #fff 42%); }
+    .row-top, .row-entry { display: flex; align-items: center; gap: 10px; }
+    .row-entry { margin-top: 10px; }
+    .seat {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      flex: none;
     }
-
-    #composer { scroll-margin-top: 12px; }
-
-    .sheet-dark {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(244, 239, 228, 0.12);
-    }
-
-    .sheet p { line-height: 1.45; }
-
-    .rule {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .banner {
-      background: #f3e2c2;
-      border-radius: 12px;
-      padding: 10px 12px;
+    .name {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      padding: 0;
       font-weight: 650;
-      margin: 14px 0 0;
+      font-size: 17px;
     }
-
-    #rateTools { margin-top: 14px; }
-
-    #rateTools label, .loss-head { font-weight: 700; }
-
-    .bulk-line, .loss-input, .actions, .dialog-actions, .section-head {
+    .name:focus { outline: none; }
+    .bal { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .pos { color: var(--green); }
+    .neg { color: var(--red); }
+    .zero { color: #9aa39e; }
+    .money {
+      flex: 1;
       display: flex;
-      gap: 8px;
       align-items: center;
+      gap: 6px;
+      min-width: 0;
+      background: #f4f7f5;
+      border-radius: 14px;
+      padding: 0 12px;
     }
-
-    .bulk-line { margin-top: 8px; }
-
-    .bulk-line input, .loss-input input, .btn {
-      border-radius: 12px;
-    }
-
-    .bulk-line input, .loss-input input {
-      width: 100%;
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      background: #fff;
-      padding: 10px 12px;
-      font-size: 16px;
-    }
-
-    .loss-input input {
+    .row.win .money { background: #fff; }
+    .row.lose .money { background: #fff; }
+    .money input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
       font-size: 22px;
       font-weight: 700;
       font-variant-numeric: tabular-nums;
+      min-height: 46px;
+      width: 100%;
     }
-
-    .bulk-line input { flex: 1; }
-
-    .section-head { justify-content: space-between; margin-bottom: 8px; }
-
-    .count {
-      margin-right: auto;
-      margin-left: 8px;
-      opacity: 0.75;
+    .money input:focus { outline: none; }
+    .money span { color: var(--muted); font-size: 14px; }
+    .row.win .money input { color: var(--green); }
+    .row.lose .money input { color: var(--red); }
+    .signs {
+      display: flex;
+      flex: none;
+      padding: 3px;
+      background: #eef2f0;
+      border-radius: 999px;
+    }
+    .sign {
+      min-height: 40px;
+      min-width: 64px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 650;
       font-size: 14px;
     }
-
-    .loss + .loss {
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid rgba(26, 23, 20, 0.08);
-    }
-
-    .loss-head { margin-bottom: 8px; }
-
-    .loss-input .unit {
-      min-width: 1.6em;
-      font-weight: 700;
-      color: var(--muted);
-    }
-
-    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-
-    .chip {
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      background: #fff;
+    .sign[data-sign="win"][aria-pressed="true"] { background: var(--green); color: #fff; }
+    .sign[data-sign="lose"][aria-pressed="true"] { background: var(--red); color: #fff; }
+    .preview { margin: 10px 4px 0; color: var(--muted); font-size: 14px; min-height: 1.4em; }
+    .empty { margin: 0; padding: 14px; color: var(--muted); }
+    .round { padding: 14px; border-top: 1px solid var(--line); }
+    .round:first-child { border-top: 0; }
+    .round-top { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+    .round p { margin: 4px 0 8px; color: var(--muted); font-size: 14px; }
+    .when { color: var(--muted); font-size: 13px; white-space: nowrap; }
+    .chip, .ghost, .danger {
+      border: 0;
       border-radius: 999px;
-      padding: 7px 11px;
-      font-weight: 650;
-    }
-
-    .hint-amt { margin: 6px 0 0; color: var(--muted); }
-
-    .preview {
-      background: #fff;
-      border: 1px solid rgba(26, 23, 20, 0.08);
-      border-radius: 14px;
-      padding: 12px;
-      margin: 14px 0;
-    }
-
-    .preview-main { margin: 0; font-size: 18px; }
-
-    .preview ul, .pays { margin: 8px 0 0; padding-left: 18px; }
-
-    .preview li, .pays li { margin: 4px 0; }
-
-    .btn { padding: 12px 14px; font-weight: 700; }
-
-    .btn-gold {
-      width: 100%;
-      background: var(--gold);
-      color: var(--gold-ink);
-      font-size: 17px;
-      padding: 15px;
-    }
-
-    .btn-gold:disabled {
-      background: #ddcdb4;
-      color: #7a7166;
-      cursor: not-allowed;
-    }
-
-    .btn-line {
-      background: transparent;
-      border: 1px solid rgba(26, 23, 20, 0.2);
+      min-height: 36px;
+      padding: 0 12px;
+      background: #eef2f0;
       color: var(--ink);
+      scroll-margin-bottom: 110px;
     }
-
-    .btn-line-light {
-      background: transparent;
-      border: 1px solid rgba(244, 239, 228, 0.35);
-      color: var(--cream);
-      border-radius: 12px;
-      padding: 8px 12px;
-      font-weight: 700;
-    }
-
-    .btn-line-light:disabled { opacity: 0.4; cursor: not-allowed; }
-
-    .btn-danger {
-      background: #8f2d26;
-      color: white;
-    }
-
-    .empty { color: var(--muted); margin: 8px 0; }
-
-    .sheet-dark .empty { color: rgba(244, 239, 228, 0.72); }
-
-    .round {
+    .sum-line, .transfer {
       display: flex;
       justify-content: space-between;
       gap: 12px;
-      align-items: flex-start;
-      padding: 12px 0;
-      border-top: 1px solid rgba(244, 239, 228, 0.12);
-    }
-
-    .round-kicker, .round-sub { margin: 0; color: rgba(244, 239, 228, 0.7); }
-
-    .round-main { margin: 2px 0; font-weight: 700; }
-
-    .round .btn-line-light { flex: none; }
-
-    .recap { list-style: none; padding: 0; margin: 8px 0 12px; }
-
-    .recap li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0;
-      border-top: 1px solid rgba(26, 23, 20, 0.08);
-    }
-
-    .recap strong {
-      margin-left: auto;
+      padding: 12px 14px;
+      border-top: 1px solid var(--line);
       font-variant-numeric: tabular-nums;
     }
-
-    .actions, .dialog-actions { margin-top: 14px; }
-
-    .actions .btn, .dialog-actions .btn { flex: 1; }
-
+    .sum-line:first-child, .transfer:first-child { border-top: 0; }
+    .transfer { color: var(--ink); background: #f7fbf8; }
+    .actions { display: flex; gap: 8px; margin-top: 12px; }
+    .actions button { flex: 1; min-height: 46px; border-radius: 14px; }
+    .ghost { background: #fff; box-shadow: var(--shadow); }
+    .danger { background: #fff; color: var(--red); box-shadow: var(--shadow); }
+    .dock {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+      background: rgba(243, 246, 244, 0.92);
+      backdrop-filter: blur(12px);
+    }
+    .dock button, .dialog-actions button {
+      width: min(480px, 100%);
+      margin: 0 auto;
+      display: block;
+      min-height: 52px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--green);
+      color: #fff;
+      font-weight: 700;
+      font-size: 17px;
+      box-shadow: 0 8px 18px rgba(14, 122, 72, 0.22);
+    }
+    .dock button:disabled { background: #d7e0db; color: #6d7872; box-shadow: none; }
+    .dialog-actions .ghost { background: #eef2f0; color: var(--ink); box-shadow: none; }
+    dialog {
+      border: 0;
+      border-radius: 18px;
+      padding: 18px;
+      width: min(420px, calc(100% - 32px));
+      box-shadow: var(--shadow);
+    }
+    dialog::backdrop { background: rgba(28, 25, 23, 0.35); }
+    dialog h2 { margin: 0 0 8px; }
+    dialog p { margin: 0; color: var(--muted); }
+    .dialog-actions { display: flex; gap: 8px; margin-top: 16px; }
+    .dialog-actions button { width: auto; flex: 1; }
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%) translateY(10px);
-      background: var(--cream);
-      color: var(--ink);
-      font-weight: 700;
-      padding: 12px 16px;
+      bottom: calc(84px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      background: #1c1917;
+      color: #fff;
       border-radius: 999px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transition: 0.2s ease;
-      max-width: calc(100% - 28px);
-      text-align: center;
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    dialog {
-      border: none;
-      border-radius: 18px;
-      padding: 22px;
-      max-width: min(380px, calc(100% - 24px));
-      background: var(--cream);
-      color: var(--ink);
-    }
-
-    dialog::backdrop { background: rgba(8, 16, 12, 0.62); }
-
-    dialog h2 { font-size: 22px; }
-
-    dialog p { color: var(--muted); }
-
-    @media (min-width: 860px) {
-      .layout {
-        display: grid;
-        grid-template-columns: 380px minmax(0, 1fr);
-        gap: 22px;
-        align-items: start;
-      }
-
-      .board-col { position: sticky; top: 16px; margin-bottom: 0; }
-    }
-
-    @media (max-width: 520px) {
-      .top { flex-direction: column; align-items: flex-start; }
-      .app { width: min(1040px, calc(100% - 20px)); }
-    }
-
-    .kinds { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-
-    .kinds button, .flag {
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      background: #fff;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-weight: 700;
-    }
-
-    .kinds button[aria-pressed="true"], .flag[aria-pressed="true"] {
-      background: #1a1714;
-      color: #f4efe4;
-      border-color: #1a1714;
-    }
-
-    .hand-flags, .stepper { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-
-    .hand-flags { margin-top: 8px; }
-
-    .rules { margin-top: 14px; }
-
-    .rules summary { cursor: pointer; font-weight: 700; }
-
-    .rule-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .rule-grid label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 13px;
-      font-weight: 650;
-    }
-
-    .rule-grid input {
-      width: 100%;
-      border: 1px solid rgba(26, 23, 20, 0.16);
-      border-radius: 10px;
-      padding: 8px 10px;
-      font-size: 16px;
-      background: #fff;
-    }
-
-    .pen-money { font-weight: 500; color: var(--muted); }
-
-    @media (prefers-reduced-motion: reduce) {
-      .player.flash, .toast { animation: none; transition: none; }
+      padding: 10px 14px;
+      max-width: calc(100% - 32px);
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="top">
-      <div>
-        <p class="eyebrow" id="tableLabel">Bàn 4 người</p>
-        <h1>Tính tiền</h1>
-        <p class="lede">Sâm lốc, mỗi người 10 lá. Quy ước đặt một lần đầu buổi. Mỗi ván sau chỉ ghi lá còn, cháy, báo sâm hoặc chặt.</p>
-      </div>
-      <label class="unit-field">Đơn vị
-        <input id="unit" maxlength="8" value="đ" aria-label="Đơn vị tiền" />
-      </label>
+  <div class="wrap">
+    <header>
+      <h1>Tính tiền</h1>
+      <p class="lede">4 người</p>
     </header>
-    <p class="example" id="exampleLine">Quy ước đang dùng: 1.000đ một lá. Báo sâm mỗi nhà mất 20.000đ. Chặt heo mỗi lần 20.000đ. Cháy 15.000đ. Thối heo chưa tính.</p>
+    <section class="sheet" id="board"></section>
+    <p class="preview" id="preview"></p>
 
-    <main class="layout">
-      <div class="board-col">
-        <div class="section-head">
-          <h2>Bàn chơi</h2>
-          <button type="button" id="addPlayer" class="btn btn-line-light">Thêm người</button>
-        </div>
-        <p class="hint">Bấm “Sửa tên” để đổi tên. Bấm thẻ để chọn người thắng, người đền hoặc người chặt. Phím 1 đến 9 chọn theo thứ tự thẻ.</p>
-        <div id="board" class="board"></div>
-        <p id="sumLine" class="sum"></p>
-      </div>
+    <h2>Các ván</h2>
+    <section class="sheet" id="rounds"></section>
 
-      <div>
-        <section class="sheet sheet-cream" id="composer">
-          <h2>Ghi một ván</h2>
-          <p class="rule">Sửa quy ước nếu bàn đổi giá. Rồi chọn kiểu ván. Ván thường thì nhập lá còn, cháy thì bấm Cháy. Hết lá thì để 0.</p>
-          <div class="kinds" id="kinds">
-            <button type="button" data-kind="thuong">Thường</button>
-            <button type="button" data-kind="trang">Tới trắng</button>
-            <button type="button" data-kind="sam">Sâm ăn</button>
-            <button type="button" data-kind="den">Đền sâm</button>
-            <button type="button" data-kind="chat">Chặt</button>
-          </div>
-          <p id="winnerBanner" class="banner" hidden></p>
-          <div id="rateTools">
-            <label for="rate">Giá mỗi lá</label>
-            <div class="bulk-line">
-              <input id="rate" inputmode="numeric" autocomplete="off" value="1000" />
-              <span class="unit" id="rateUnit">đ</span>
-            </div>
-            <div class="chips" id="rateChips">
-              <button type="button" class="chip" data-rate="1000">1k</button>
-              <button type="button" class="chip" data-rate="2000">2k</button>
-              <button type="button" class="chip" data-rate="5000">5k</button>
-              <button type="button" class="chip" data-rate="10000">10k</button>
-              <button type="button" class="chip" data-rate="20000">20k</button>
-            </div>
-          </div>
-          <details class="rules" id="penaltyBox" open>
-            <summary>Quy ước đầu ván, tính bằng lá</summary>
-            <div class="rule-grid">
-              <label>Báo sâm, tới trắng<input id="penSam" inputmode="numeric" value="20" /><span class="pen-money" data-pen="sam"></span></label>
-              <label>Chặt 1 heo<input id="penChat" inputmode="numeric" value="20" /><span class="pen-money" data-pen="chat"></span></label>
-              <label>Cháy<input id="penCong" inputmode="numeric" value="15" /><span class="pen-money" data-pen="cong"></span></label>
-              <label>Thối 1 heo<input id="penHeo" inputmode="numeric" value="0" /><span class="pen-money" data-pen="heo"></span></label>
-              <label>Thối 1 tứ quý<input id="penTu" inputmode="numeric" value="0" /><span class="pen-money" data-pen="tuQuy"></span></label>
-            </div>
-            <p class="rule" id="conventionLine"></p>
-          </details>
-          <div id="lossRows"></div>
-          <div id="preview"></div>
-          <button type="button" id="commitBtn" class="btn btn-gold" disabled>Ghi ván</button>
-        </section>
-
-        <section class="sheet sheet-dark">
-          <div class="section-head">
-            <h2>Các ván</h2>
-            <span id="roundCount" class="count"></span>
-            <button type="button" id="undoBtn" class="btn btn-line-light" disabled>Hoàn tác</button>
-          </div>
-          <div id="history"></div>
-        </section>
-
-        <section class="sheet sheet-cream">
-          <h2>Chốt sổ</h2>
-          <p class="rule">Gom các khoản lại để biết cuối buổi ai trả ai.</p>
-          <div id="settleBody"></div>
-          <div class="actions">
-            <button type="button" id="copyBtn" class="btn btn-line">Chép kết quả</button>
-            <button type="button" id="resetBtn" class="btn btn-danger">Xóa sổ</button>
-          </div>
-        </section>
-      </div>
-    </main>
+    <h2>Tổng kết</h2>
+    <section class="sheet" id="summary"></section>
+    <div class="actions">
+      <button type="button" class="ghost" id="copyBtn">Chép tổng kết</button>
+      <button type="button" class="danger" id="resetBtn">Xóa hết</button>
+    </div>
   </div>
 
-  <dialog id="resetDialog">
-    <h2>Xóa toàn bộ các ván?</h2>
-    <p>Tên mọi người và đơn vị tiền vẫn được giữ.</p>
-    <form method="dialog" class="dialog-actions">
-      <button type="submit" class="btn btn-line" value="cancel">Giữ lại</button>
-      <button type="submit" class="btn btn-danger" value="ok">Xóa sổ</button>
-    </form>
-  </dialog>
+  <div class="dock">
+    <button type="button" id="saveBtn" disabled>Lưu ván</button>
+  </div>
 
-  <div id="toast" class="toast" role="status"></div>
+  <dialog id="ask">
+    <h2 id="askTitle">Xóa?</h2>
+    <p id="askText"></p>
+    <div class="dialog-actions">
+      <button type="button" class="ghost" id="askNo">Không</button>
+      <button type="button" id="askYes">Xóa</button>
+    </div>
+  </dialog>
+  <p class="toast" id="toast" hidden></p>
 
   <script>
-    const STORAGE_KEY = "baibac-tinh-tien-v1";
-    const PALETTE = ["#c45c26", "#1f6f8b", "#2f6b45", "#8a3d55", "#8a6a1f", "#3d4f8a", "#6b3f6a", "#1d6b5a", "#8a4030", "#355f8a"];
-    const MAX_PLAYERS = 16;
-    const KINDS = ["thuong", "trang", "sam", "den", "chat"];
-    const KIND_NAME = { thuong: "Thường", trang: "Tới trắng", sam: "Sâm ăn", den: "Đền sâm", chat: "Chặt" };
-    const PENALTY_FIELDS = { penHeo: "heo", penCong: "cong", penTu: "tuQuy", penSam: "sam", penChat: "chat" };
+    const KEY = "baibac-bon-nguoi";
+    const SEATS = ["#0e7a48", "#c46a1a", "#1d4e89", "#7c3a63"];
 
-    let state = loadState();
-    let toastTimer = 0;
-
-    function colorFor(index) {
-      return PALETTE[index % PALETTE.length];
-    }
-
-    function nextColor(players) {
-      return PALETTE.find((color) => !players.some((player) => player.color === color)) || colorFor(players.length);
-    }
-
-    function makePlayer(id, index, name) {
-      return { id, name: name || defaultName(index), color: colorFor(index) };
-    }
-
-    function defaultState() {
+    function blank() {
       return {
-        unit: "đ",
-        winnerId: null,
-        rate: "1000",
-        kind: "thuong",
-        victimId: null,
-        penalties: { heo: 0, cong: 15, tuQuy: 0, sam: 20, chat: 20 },
-        players: [1, 2, 3, 4].map((n) => makePlayer(`p${n}`, n - 1)),
-        draft: { p1: emptyHand(), p2: emptyHand(), p3: emptyHand(), p4: emptyHand() },
+        players: [1, 2, 3, 4].map((n) => ({ id: "p" + n, name: "Người " + n })),
+        draft: {},
         rounds: [],
       };
     }
 
-    function uid() {
-      return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-    }
-
-    function esc(value) {
-      return String(value).replace(/[&<>"']/g, (ch) => ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-      }[ch]));
-    }
-
-    function sanitizeAmount(value, max = 999999999) {
-      const n = Math.round(Number(value));
-      if (!Number.isFinite(n) || n <= 0) return 0;
-      return Math.min(n, max);
-    }
-
-    function parseAmount(raw) {
-      let text = String(raw ?? "").trim().replace(/\s/g, "");
-      if (!text) return 0;
-      if (/^\d{1,3}([.,]\d{3})+$/.test(text)) text = text.replace(/[.,]/g, "");
-      else text = text.replace(/[^\d]/g, "");
-      return sanitizeAmount(text);
-    }
-
-    function parseCards(raw) {
-      return Math.min(parseAmount(raw), 10);
-    }
-
-    function emptyHand() {
-      return { cards: "", heo: 0, cong: false, tuQuy: 0 };
-    }
-
-    function clampCount(value, max) {
-      const n = Math.round(Number(value));
-      if (!Number.isFinite(n) || n < 0) return 0;
-      return Math.min(max, n);
-    }
-
-    function penalty(key) {
-      return clampCount(state.penalties[key], 99);
-    }
-
-    function normalizeHand(value) {
-      if (value && typeof value === "object") {
-        const cards = parseCards(value.cards);
-        const cong = Boolean(value.cong);
-        let heo = clampCount(value.heo, 4);
-        if (!cong && cards && heo > cards) heo = cards;
-        return { cards: cards ? String(cards) : "", heo, cong, tuQuy: clampCount(value.tuQuy, 2) };
-      }
-      const cards = parseCards(value);
-      return { cards: cards ? String(cards) : "", heo: 0, cong: false, tuQuy: 0 };
-    }
-
-    function handOf(id) {
-      state.draft[id] = normalizeHand(state.draft[id]);
-      return state.draft[id];
-    }
-
-    function leavesFor(hand) {
-      const base = hand.cong ? penalty("cong") : parseCards(hand.cards);
-      return base + hand.heo * penalty("heo") + hand.tuQuy * penalty("tuQuy");
-    }
-
-    function currentRate() {
-      return parseAmount(state.rate);
-    }
-
-    function formatPlain(value) {
-      return Math.abs(Math.round(value)).toLocaleString("vi-VN");
-    }
-
-    function formatSigned(value) {
-      const n = Math.round(value);
-      if (n > 0) return `+${n.toLocaleString("vi-VN")}`;
-      if (n < 0) return `−${Math.abs(n).toLocaleString("vi-VN")}`;
-      return "0";
-    }
-
-    function withUnit(text) {
-      return state.unit ? `${text} ${state.unit}` : text;
-    }
-
-    function getPlayer(id) {
-      return state.players.find((player) => player.id === id) || null;
-    }
-
-    function defaultName(index) {
-      return `Người ${index + 1}`;
-    }
-
-    function displayName(player) {
-      const index = state.players.findIndex((item) => item.id === player.id);
-      const name = player.name.trim() || defaultName(index);
-      const duplicates = state.players.filter((item, itemIndex) => {
-        return (item.name.trim() || defaultName(itemIndex)) === name;
-      });
-      return duplicates.length > 1 ? `${name} (${index + 1})` : name;
-    }
-
-    function loadState() {
-      const base = defaultState();
+    function load() {
+      const next = blank();
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return base;
-        const data = JSON.parse(raw);
-        if (!data || typeof data !== "object") return base;
-        if (typeof data.unit === "string") base.unit = data.unit.replace(/[<>]/g, "").slice(0, 8);
-        const savedRate = parseAmount(data.rate);
-        base.rate = savedRate ? String(savedRate) : "1000";
-        if (KINDS.includes(data.kind)) base.kind = data.kind;
-        if (data.penalties && typeof data.penalties === "object") {
-          for (const key of Object.keys(base.penalties)) base.penalties[key] = clampCount(data.penalties[key], 99);
-          const previousDefaults = { heo: 5, cong: 15, tuQuy: 10, sam: 20, chat: 15 };
-          const stillOld = Object.keys(previousDefaults).every((key) => base.penalties[key] === previousDefaults[key]);
-          if (stillOld) base.penalties = { heo: 0, cong: 15, tuQuy: 0, sam: 20, chat: 20 };
+        const data = JSON.parse(localStorage.getItem(KEY) || "null");
+        if (!data) return next;
+        for (const player of next.players) {
+          const saved = (data.players || []).find((item) => item.id === player.id);
+          if (saved && String(saved.name || "").trim()) player.name = String(saved.name).trim().slice(0, 24);
+          const item = data.draft && data.draft[player.id];
+          if (item && typeof item === "object") {
+            next.draft[player.id] = {
+              amt: String(item.amt || "").replace(/[^\d]/g, "").slice(0, 12),
+              sign: item.sign === "win" || item.sign === "lose" ? item.sign : "",
+            };
+          }
         }
-        const loadedPlayers = parsePlayers(data.players);
-        if (loadedPlayers) {
-          base.players = loadedPlayers;
-          base.draft = {};
-        }
-        if (data.draft && typeof data.draft === "object") {
-          for (const player of base.players) base.draft[player.id] = normalizeHand(data.draft[player.id]);
-        }
-        if (base.players.some((player) => player.id === data.winnerId)) base.winnerId = data.winnerId;
-        if (base.players.some((player) => player.id === data.victimId)) base.victimId = data.victimId;
         if (Array.isArray(data.rounds)) {
-          for (const round of data.rounds) {
-            if (!round || !getPlayerFrom(base, round.winnerId)) continue;
-            const losses = {};
-            if (round.losses && typeof round.losses === "object") {
-              for (const [id, amount] of Object.entries(round.losses)) {
-                if (!getPlayerFrom(base, id) || id === round.winnerId) continue;
-                const n = sanitizeAmount(amount);
-                if (n > 0) losses[id] = n;
-              }
-            }
-            const deltas = {};
-            if (round.deltas && typeof round.deltas === "object") {
-              for (const [id, amount] of Object.entries(round.deltas)) {
-                const n = Math.round(Number(amount));
-                if (!Number.isFinite(n) || n === 0 || !getPlayerFrom(base, id)) continue;
-                deltas[id] = n;
-              }
-            }
-            if (!Object.keys(losses).length && !Object.keys(deltas).length) continue;
-            if (!Object.keys(deltas).length && !getPlayerFrom(base, round.winnerId)) continue;
-            const cards = {};
-            if (round.cards && typeof round.cards === "object") {
-              for (const [cardId, count] of Object.entries(round.cards)) {
-                const n = Math.min(parseAmount(count), 99);
-                if (n > 0 && getPlayerFrom(base, cardId) && cardId !== round.winnerId) cards[cardId] = n;
-              }
-            }
-            const parts = Array.isArray(round.parts)
-              ? round.parts.filter((part) => part && getPlayerFrom(base, part.id)).map((part) => ({
-                id: part.id,
-                note: String(part.note || "").slice(0, 120),
-              }))
-              : [];
-            const id = String(round.id || uid()).replace(/[^\w-]/g, "").slice(0, 40) || uid();
-            base.rounds.push({
-              id,
-              at: Number(round.at) || Date.now(),
-              winnerId: getPlayerFrom(base, round.winnerId) ? round.winnerId : null,
-              payerId: getPlayerFrom(base, round.payerId) ? round.payerId : null,
-              kind: KINDS.includes(round.kind) ? round.kind : "",
-              rate: parseAmount(round.rate),
-              cards,
-              losses,
-              deltas: Object.keys(deltas).length ? deltas : null,
-              parts,
-            });
-          }
+          next.rounds = data.rounds.filter((round) => round && round.deltas && typeof round.deltas === "object").slice(-200);
         }
-      } catch {
-        return defaultState();
-      }
-      return base;
+      } catch (error) {}
+      return next;
     }
 
-    function getPlayerFrom(source, id) {
-      return source.players.find((player) => player.id === id) || null;
-    }
+    let state = load();
+    let pending = null;
+    let toastTimer = 0;
 
-    function parsePlayers(saved) {
-      if (!Array.isArray(saved)) return null;
-      const players = [];
-      const seen = new Set();
-      for (const item of saved) {
-        if (!item || typeof item.id !== "string" || !/^p\d{1,4}$/.test(item.id) || seen.has(item.id)) continue;
-        seen.add(item.id);
-        const name = String(item.name || "").replace(/[<>]/g, "").slice(0, 24).trim();
-        const color = typeof item.color === "string" && /^#[0-9a-fA-F]{6}$/.test(item.color)
-          ? item.color
-          : colorFor(players.length);
-        players.push({ id: item.id, name: name || defaultName(players.length), color });
-        if (players.length >= MAX_PLAYERS) break;
-      }
-      return players.length >= 2 ? players : null;
+    function save() { localStorage.setItem(KEY, JSON.stringify(state)); }
+    function uid() { return Math.random().toString(36).slice(2, 10); }
+    function parseAmount(raw) {
+      const digits = String(raw ?? "").replace(/[^\d]/g, "");
+      if (!digits) return 0;
+      return Math.min(Number(digits), 100000000000);
     }
-
-    function clearDraft() {
-      for (const player of state.players) state.draft[player.id] = emptyHand();
-      state.victimId = null;
+    function formatPlain(amount) {
+      return new Intl.NumberFormat("vi-VN").format(Math.abs(Math.round(amount))) + " đ";
     }
-
-    function focusButton(selected) {
-      if (state.kind === "den") return selected ? "Người đền" : "Chọn người đền";
-      if (state.kind === "chat") return selected ? "Người chặt" : "Chọn người chặt";
-      return selected ? "Người thắng ván này" : "Chọn thắng";
+    function formatSigned(amount) {
+      const n = Math.round(amount);
+      if (!n) return "0 đ";
+      return (n > 0 ? "+" : "−") + formatPlain(n);
     }
-
-    function playerInRounds(id) {
-      return state.rounds.some((round) => {
-        if (round.winnerId === id || round.payerId === id) return true;
-        if (round.losses && Object.prototype.hasOwnProperty.call(round.losses, id)) return true;
-        return Boolean(round.deltas && round.deltas[id]);
-      });
+    function tone(amount) {
+      if (amount > 0) return "pos";
+      if (amount < 0) return "neg";
+      return "zero";
     }
-
-    function addPlayer() {
-      if (state.players.length >= MAX_PLAYERS) {
-        toast(`Nhiều nhất ${MAX_PLAYERS} người`);
-        return;
-      }
-      let n = 1;
-      const used = new Set(state.players.map((player) => player.id));
-      while (used.has(`p${n}`)) n += 1;
-      const id = `p${n}`;
-      state.players.push({
-        id,
-        name: defaultName(state.players.length),
-        color: nextColor(state.players),
-      });
-      state.draft[id] = emptyHand();
-      saveState();
-      refreshAll();
-      const input = document.querySelector(`.name[data-id="${id}"]`);
-      if (input) {
-        input.focus();
-        input.select();
-      }
+    function esc(value) {
+      return String(value).replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
     }
-
-    function removePlayer(id) {
-      if (state.players.length <= 2) {
-        toast("Cần ít nhất 2 người");
-        return;
-      }
-      const player = getPlayer(id);
-      if (!player) return;
-      if (playerInRounds(id)) {
-        toast("Người này đã có ván, chỉ sửa tên được");
-        return;
-      }
-      state.players = state.players.filter((item) => item.id !== id);
-      delete state.draft[id];
-      if (state.winnerId === id) state.winnerId = null;
-      saveState();
-      refreshAll();
-      toast(`Đã bỏ ${player.name.trim() || "người này"}`);
+    function nameOf(id) {
+      const player = state.players.find((item) => item.id === id);
+      return player ? player.name : "Người";
     }
-
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          unit: state.unit,
-          rate: state.rate,
-          kind: state.kind,
-          victimId: state.victimId,
-          penalties: state.penalties,
-          winnerId: state.winnerId,
-          players: state.players.map((player) => ({ id: player.id, name: player.name, color: player.color })),
-          draft: state.draft,
-          rounds: state.rounds,
-        }));
-      } catch {
-        /* Trình duyệt chặn lưu thì ván hiện tại vẫn chạy trong phiên này. */
-      }
+    function cell(id) {
+      return state.draft[id] || { amt: "", sign: "" };
     }
-
-    function computeBalances() {
-      const totals = Object.fromEntries(state.players.map((player) => [player.id, 0]));
+    function signed(id) {
+      const item = cell(id);
+      const money = parseAmount(item.amt);
+      if (!money || (item.sign !== "win" && item.sign !== "lose")) return 0;
+      return item.sign === "win" ? money : -money;
+    }
+    function balances() {
+      const totals = {};
+      for (const player of state.players) totals[player.id] = 0;
       for (const round of state.rounds) {
-        if (round.deltas) {
-          for (const [id, amount] of Object.entries(round.deltas)) {
-            const n = Math.round(Number(amount));
-            if (Number.isFinite(n) && totals[id] != null) totals[id] += n;
-          }
-          continue;
-        }
-        if (!round.losses) continue;
-        let gain = 0;
-        for (const [id, amount] of Object.entries(round.losses)) {
-          const n = sanitizeAmount(amount, 1000000000000);
-          if (!n || totals[id] == null || id === round.winnerId) continue;
-          totals[id] -= n;
-          gain += n;
-        }
-        if (totals[round.winnerId] != null) totals[round.winnerId] += gain;
+        for (const player of state.players) totals[player.id] += round.deltas[player.id] || 0;
       }
       return totals;
     }
-
-    function priced(leaves) {
-      const rate = currentRate();
-      if (!leaves) return "chưa tính";
-      if (!rate) return `${leaves} lá`;
-      return withUnit(formatPlain(leaves * rate));
-    }
-
-    function paintConvention() {
-      const line = document.getElementById("conventionLine");
-      if (line) {
-        const rate = currentRate();
-        const price = rate ? withUnit(formatPlain(rate)) : "chưa có giá";
-        const heo = penalty("heo") ? `Thối 1 heo ${priced(penalty("heo"))}.` : "Thối heo chưa tính.";
-        const tu = penalty("tuQuy") ? ` Thối 1 tứ quý ${priced(penalty("tuQuy"))}.` : "";
-        const text = `${price} một lá. Báo sâm mỗi nhà mất ${priced(penalty("sam"))}. Chặt heo mỗi lần ${priced(penalty("chat"))}. Cháy ${priced(penalty("cong"))}. ${heo}${tu}`;
-        line.textContent = text;
-        const example = document.getElementById("exampleLine");
-        if (example) example.textContent = `Quy ước đang dùng: ${text}`;
-      }
-      for (const node of document.querySelectorAll("[data-pen]")) {
-        const leaves = penalty(node.dataset.pen);
-        node.textContent = leaves ? priced(leaves) : "chưa tính";
-      }
-    }
-
-    function handNote(hand, leaves) {
-      const bits = [];
-      if (hand.cong) bits.push(`cháy ${penalty("cong")} lá`);
-      else bits.push(`${parseCards(hand.cards)} lá`);
-      if (hand.heo && penalty("heo")) bits.push(`${hand.heo} heo +${hand.heo * penalty("heo")}`);
-      if (hand.tuQuy && penalty("tuQuy")) bits.push(`${hand.tuQuy} tứ quý +${hand.tuQuy * penalty("tuQuy")}`);
-      return `${bits.join(", ")} = ${leaves} lá`;
-    }
-
-    function buildPlan() {
-      const rate = currentRate();
-      const focus = getPlayer(state.winnerId);
-      const kind = KINDS.includes(state.kind) ? state.kind : "thuong";
-      const blank = { ok: false, reason: focus ? "rate" : "pick", deltas: {}, parts: [], title: "", kind, rate, focus };
-      if (!focus) return { ...blank, reason: "pick" };
-      if (!rate) return { ...blank, reason: "rate" };
-      const others = state.players.filter((player) => player.id !== focus.id);
+    function plan() {
       const deltas = {};
       const parts = [];
-
-      if (kind === "thuong") {
-        let gain = 0;
-        for (const player of others) {
-          const hand = handOf(player.id);
-          const leaves = leavesFor(hand);
-          if (!leaves) continue;
-          const money = leaves * rate;
-          deltas[player.id] = -money;
-          gain += money;
-          parts.push({ id: player.id, note: `${handNote(hand, leaves)}, trừ ${withUnit(formatPlain(money))}` });
-        }
-        if (!gain) return { ...blank, reason: "cards" };
-        deltas[focus.id] = gain;
-        return { ok: true, deltas, parts, title: `${displayName(focus)} được ${withUnit(formatSigned(gain))}`, kind, rate, focus, payerId: null };
+      let total = 0;
+      let used = 0;
+      let missingSign = false;
+      for (const player of state.players) {
+        const item = cell(player.id);
+        const money = parseAmount(item.amt);
+        if (!money) continue;
+        if (item.sign !== "win" && item.sign !== "lose") { missingSign = true; continue; }
+        const amount = item.sign === "win" ? money : -money;
+        deltas[player.id] = amount;
+        total += amount;
+        used += 1;
+        parts.push(player.name + " " + formatSigned(amount));
       }
-
-      if (kind === "trang" || kind === "sam") {
-        const leaves = penalty("sam");
-        if (!leaves) return { ...blank, reason: "penalty" };
-        const money = leaves * rate;
-        let gain = 0;
-        for (const player of others) {
-          deltas[player.id] = -money;
-          gain += money;
-          parts.push({ id: player.id, note: `trả ${leaves} lá, ${withUnit(formatPlain(money))}` });
-        }
-        deltas[focus.id] = gain;
-        const verb = kind === "trang" ? "tới trắng" : "báo sâm được";
-        return { ok: true, deltas, parts, title: `${displayName(focus)} ${verb}, được ${withUnit(formatSigned(gain))}`, kind, rate, focus, payerId: null };
-      }
-
-      if (kind === "den") {
-        const leaves = penalty("sam");
-        if (!leaves) return { ...blank, reason: "penalty" };
-        const money = leaves * rate;
-        let loss = 0;
-        for (const player of others) {
-          deltas[player.id] = money;
-          loss += money;
-          parts.push({ id: player.id, note: `được ${leaves} lá, ${withUnit(formatPlain(money))}` });
-        }
-        deltas[focus.id] = -loss;
-        return { ok: true, deltas, parts, title: `${displayName(focus)} đền ${withUnit(formatPlain(loss))}`, kind, rate, focus, payerId: focus.id };
-      }
-
-      const victim = getPlayer(state.victimId);
-      const leaves = penalty("chat");
-      if (!victim || victim.id === focus.id) return { ...blank, reason: "victim" };
-      if (!leaves) return { ...blank, reason: "penalty" };
-      const money = leaves * rate;
-      deltas[focus.id] = money;
-      deltas[victim.id] = -money;
-      parts.push({ id: victim.id, note: `bị chặt ${leaves} lá, trả ${withUnit(formatPlain(money))}` });
-      return { ok: true, deltas, parts, title: `${displayName(focus)} chặt ${displayName(victim)}, được ${withUnit(formatPlain(money))}`, kind, rate, focus, payerId: victim.id };
+      if (!used && !missingSign) return { ok: false, reason: "empty", total: 0, parts, deltas };
+      if (missingSign) return { ok: false, reason: "sign", total, parts, deltas };
+      if (total !== 0) return { ok: false, reason: "sum", total, parts, deltas };
+      const winner = state.players.slice().sort((a, b) => (deltas[b.id] || 0) - (deltas[a.id] || 0))[0];
+      return { ok: true, deltas, parts, winner };
     }
-
-    function previewDeltas() {
-      return buildPlan().deltas;
-    }
-
-    function settle(balances) {
+    function settle(totals) {
       const debtors = [];
       const creditors = [];
       for (const player of state.players) {
-        const amount = balances[player.id] || 0;
-        if (amount < 0) debtors.push({ name: displayName(player), left: -amount });
-        else if (amount > 0) creditors.push({ name: displayName(player), left: amount });
+        const amount = totals[player.id] || 0;
+        if (amount < 0) debtors.push({ name: player.name, left: -amount });
+        else if (amount > 0) creditors.push({ name: player.name, left: amount });
       }
       debtors.sort((a, b) => b.left - a.left);
       creditors.sort((a, b) => b.left - a.left);
-      const transfers = [];
+      const rows = [];
       let i = 0;
       let j = 0;
       while (i < debtors.length && j < creditors.length) {
         const amount = Math.min(debtors[i].left, creditors[j].left);
         if (!amount) break;
-        transfers.push({ from: debtors[i].name, to: creditors[j].name, amount });
+        rows.push(debtors[i].name + " trả " + creditors[j].name + " " + formatPlain(amount));
         debtors[i].left -= amount;
         creditors[j].left -= amount;
-        if (debtors[i].left === 0) i += 1;
-        if (creditors[j].left === 0) j += 1;
+        if (!debtors[i].left) i += 1;
+        if (!creditors[j].left) j += 1;
       }
-      return transfers;
+      return rows;
+    }
+    function summaryText() {
+      const totals = balances();
+      const lines = ["Tổng kết", ""];
+      for (const player of state.players) lines.push(player.name + ": " + formatSigned(totals[player.id]));
+      const rows = settle(totals);
+      lines.push("", rows.length ? "Ai trả ai:" : "Sổ đang hòa.");
+      for (const row of rows) lines.push(row);
+      return lines.join("\n");
+    }
+    function toast(message) {
+      const node = document.getElementById("toast");
+      node.hidden = false;
+      node.textContent = message;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { node.hidden = true; }, 2200);
     }
 
-    function renderBoard(changedIds) {
-      const balances = computeBalances();
-      const deltas = previewDeltas();
+    function renderBoard() {
+      const totals = balances();
       document.getElementById("board").innerHTML = state.players.map((player, index) => {
-        const balance = balances[player.id] || 0;
-        const delta = deltas[player.id] || 0;
-        const tone = balance > 0 ? "pos" : balance < 0 ? "neg" : "zero";
-        const word = balance > 0 ? "được tiền" : balance < 0 ? "đang thua" : "hòa vốn";
-        const winner = state.winnerId === player.id;
-        const deltaText = delta ? `Ván này ${withUnit(formatSigned(delta))}` : "";
+        const item = cell(player.id);
         return `
-          <article class="player${winner ? " is-winner" : ""}" data-player="${player.id}">
-            <div class="player-top">
-              <span class="dot" style="background:${player.color}"></span>
-              <input class="name" data-id="${player.id}" maxlength="24" spellcheck="false" aria-label="Tên ${esc(displayName(player))}" value="${esc(player.name)}" />
+          <div class="row ${item.sign || ""}">
+            <div class="row-top">
+              <span class="seat" style="background:${SEATS[index]}">${index + 1}</span>
+              <input class="name" aria-label="Tên ${esc(player.name)}" data-name="${player.id}" value="${esc(player.name)}" maxlength="24" />
+              <span class="bal ${tone(totals[player.id])}">${formatSigned(totals[player.id])}</span>
             </div>
-            <div class="card-tools">
-              <button type="button" class="mini rename" data-action="rename" data-id="${player.id}">Sửa tên</button>
-              ${state.players.length > 2 ? `<button type="button" class="mini remove" data-action="remove-player" data-id="${player.id}">Bỏ</button>` : ""}
-            </div>
-            <p class="bal ${tone}">${formatSigned(balance)} <small>${esc(state.unit)}</small></p>
-            <p class="bal-word">${word}</p>
-            <p class="delta" data-delta="${player.id}">${deltaText}</p>
-            <button type="button" class="pick" aria-pressed="${winner ? "true" : "false"}">${focusButton(winner)}</button>
-          </article>`;
-      }).join("");
-
-      if (!changedIds || !changedIds.length) return;
-      requestAnimationFrame(() => {
-        for (const id of changedIds) {
-          const card = document.querySelector(`[data-player="${id}"]`);
-          if (!card) continue;
-          card.classList.remove("flash");
-          void card.offsetWidth;
-          card.classList.add("flash");
-        }
-      });
-    }
-
-    function renderBoardDeltasOnly() {
-      const deltas = previewDeltas();
-      for (const player of state.players) {
-        const node = document.querySelector(`[data-delta="${player.id}"]`);
-        if (!node) continue;
-        const delta = deltas[player.id] || 0;
-        node.textContent = delta ? `Ván này ${withUnit(formatSigned(delta))}` : "";
-      }
-    }
-
-    function bannerText(focus) {
-      const name = displayName(focus);
-      if (state.kind === "trang") return `${name} tới trắng — mỗi nhà mất ${priced(penalty("sam"))}.`;
-      if (state.kind === "sam") return `${name} báo sâm được — mỗi nhà mất ${priced(penalty("sam"))}.`;
-      if (state.kind === "den") return `${name} đền sâm — trả mỗi nhà ${priced(penalty("sam"))}.`;
-      if (state.kind === "chat") return `${name} chặt heo — mỗi lần ${priced(penalty("chat"))}. Chọn người bị chặt.`;
-      return `${name} về nhất — cộng số lá còn. Ai không đi được lá nào thì bấm Cháy.`;
-    }
-
-    function renderKinds() {
-      document.querySelectorAll("#kinds [data-kind]").forEach((button) => {
-        button.setAttribute("aria-pressed", button.dataset.kind === state.kind ? "true" : "false");
-      });
-    }
-
-    function renderLossRows() {
-      const focus = getPlayer(state.winnerId);
-      const banner = document.getElementById("winnerBanner");
-      const host = document.getElementById("lossRows");
-      const rateUnit = document.getElementById("rateUnit");
-      if (rateUnit) rateUnit.textContent = state.unit;
-      if (!focus) {
-        banner.hidden = true;
-        host.innerHTML = '<p class="empty">Chọn người trên bàn: người thắng, người đền, hoặc người chặt.</p>';
-        return;
-      }
-      banner.hidden = false;
-      banner.textContent = bannerText(focus);
-      if (state.kind === "chat") {
-        host.innerHTML = state.players.filter((player) => player.id !== focus.id).map((player) => `
-          <div class="loss">
-            <button type="button" class="flag" data-action="victim" data-id="${player.id}" aria-pressed="${state.victimId === player.id ? "true" : "false"}">${esc(displayName(player))} bị chặt</button>
-          </div>`).join("");
-        return;
-      }
-      if (state.kind !== "thuong") {
-        host.innerHTML = "";
-        return;
-      }
-      host.innerHTML = state.players.filter((player) => player.id !== focus.id).map((player) => {
-        const hand = handOf(player.id);
-        const heo = penalty("heo") ? `
-              <div class="stepper">
-                <button type="button" class="chip" data-action="heo" data-dir="-1" data-id="${player.id}">−</button>
-                <span>${hand.heo} heo</span>
-                <button type="button" class="chip" data-action="heo" data-dir="1" data-id="${player.id}">+</button>
-              </div>` : "";
-        const tuQuy = penalty("tuQuy") ? `<button type="button" class="flag" data-action="tuquy" data-id="${player.id}" aria-pressed="${hand.tuQuy ? "true" : "false"}">${hand.tuQuy ? `Tứ quý ×${hand.tuQuy}` : "Tứ quý"}</button>` : "";
-        return `
-          <div class="loss">
-            <div class="loss-head">
-              <span class="dot" style="background:${player.color}"></span>
-              <label for="loss-${player.id}">${esc(displayName(player))} còn</label>
-            </div>
-            <div class="loss-input">
-              <input class="amt" id="loss-${player.id}" data-id="${player.id}" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(hand.cards)}" ${hand.cong ? "disabled" : ""} />
-              <span class="unit">lá</span>
-            </div>
-            <div class="hand-flags">
-              ${heo}
-              <button type="button" class="flag" data-action="cong" data-id="${player.id}" aria-pressed="${hand.cong ? "true" : "false"}">Cháy</button>
-              ${tuQuy}
-            </div>
-            <p class="hint-amt" data-hint="${player.id}"></p>
-            <div class="chips">
-              ${[1, 2, 3, 5, 10].map((amount) => `<button type="button" class="chip" data-action="add" data-id="${player.id}" data-amt="${amount}" ${hand.cong ? "disabled" : ""}>+${amount}</button>`).join("")}
-              <button type="button" class="chip" data-action="clear" data-id="${player.id}">Xóa</button>
+            <div class="row-entry">
+              <div class="money">
+                <input id="amt-${player.id}" aria-label="Tiền ${esc(player.name)}" data-amt="${player.id}" inputmode="numeric" autocomplete="off" placeholder="0" value="${esc(item.amt)}" />
+                <span>đ</span>
+              </div>
+              <div class="signs">
+                <button type="button" class="sign" data-sign="win" data-id="${player.id}" aria-pressed="${item.sign === "win" ? "true" : "false"}">Cộng</button>
+                <button type="button" class="sign" data-sign="lose" data-id="${player.id}" aria-pressed="${item.sign === "lose" ? "true" : "false"}">Trừ</button>
+              </div>
             </div>
           </div>`;
       }).join("");
     }
 
-    function paintLossHints() {
-      if (state.kind !== "thuong") return;
-      const rate = currentRate();
-      for (const player of state.players) {
-        const hint = document.querySelector(`[data-hint="${player.id}"]`);
-        if (!hint) continue;
-        const hand = handOf(player.id);
-        const leaves = leavesFor(hand);
-        if (!leaves) hint.textContent = "Hết lá, không trừ";
-        else if (!rate) hint.textContent = `${handNote(hand, leaves)} · chưa có giá`;
-        else hint.textContent = `${handNote(hand, leaves)} · ${withUnit(formatPlain(leaves * rate))}`;
-      }
-    }
-
     function renderPreview() {
-      paintConvention();
-      paintLossHints();
+      const button = document.getElementById("saveBtn");
       const box = document.getElementById("preview");
-      const button = document.getElementById("commitBtn");
-      const plan = buildPlan();
-      button.disabled = !plan.ok;
-      button.textContent = plan.ok ? `Ghi · ${plan.title}` : "Ghi ván";
-      if (!plan.focus) {
-        box.innerHTML = "";
+      const current = plan();
+      if (current.reason === "empty") {
+        button.disabled = true;
+        button.textContent = "Lưu ván";
+        box.textContent = "Nhập số, rồi bấm Cộng hoặc Trừ.";
         return;
       }
-      if (plan.reason === "rate") {
-        box.innerHTML = '<p class="empty">Nhập giá mỗi lá. Mặc định 1.000.</p>';
+      if (current.reason === "sign") {
+        button.disabled = true;
+        button.textContent = "Lưu ván";
+        box.textContent = "Bấm Cộng hoặc Trừ cho ô vừa nhập.";
         return;
       }
-      if (plan.reason === "victim") {
-        box.innerHTML = '<p class="empty">Chọn người bị chặt.</p>';
+      if (current.reason === "sum") {
+        button.disabled = true;
+        button.textContent = "Lưu ván";
+        box.textContent = "Tổng đang lệch " + formatSigned(current.total) + ". Sửa cho về 0.";
         return;
       }
-      if (plan.reason === "cards") {
-        box.innerHTML = '<p class="empty">Nhập số lá còn. Cháy thì bấm Cháy. Hết lá thì để 0.</p>';
-        return;
-      }
-      if (!plan.ok) {
-        box.innerHTML = '<p class="empty">Mức này đang là 0. Sửa trong quy ước đầu ván.</p>';
-        return;
-      }
-      box.innerHTML = `
-        <p class="preview-main">${esc(plan.title)}</p>
-        <ul>${plan.parts.map((part) => `<li>${esc(displayName(getPlayer(part.id)))}: ${esc(part.note)}</li>`).join("")}</ul>`;
+      button.disabled = false;
+      button.textContent = "Lưu ván";
+      box.textContent = current.parts.join(" · ");
     }
 
-    function renderHistory() {
-      const count = state.rounds.length;
-      document.getElementById("roundCount").textContent = count ? `${count} ván` : "Chưa có";
-      document.getElementById("undoBtn").disabled = count === 0;
-      const host = document.getElementById("history");
-      if (!count) {
-        host.innerHTML = '<p class="empty">Chưa ghi ván nào.</p>';
+    function renderRounds() {
+      const host = document.getElementById("rounds");
+      if (!state.rounds.length) {
+        host.innerHTML = '<p class="empty">Chưa có ván nào.</p>';
         return;
       }
-      host.innerHTML = [...state.rounds].reverse().map((round, index) => {
-        const time = new Date(round.at).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" });
-        const rateNote = round.rate ? ` · ${formatPlain(round.rate)}/lá` : "";
-        const kindNote = round.kind ? `${KIND_NAME[round.kind]} · ` : "";
-        let main = "";
-        let details = "";
-        if (round.parts && round.parts.length) {
-          const focus = getPlayer(round.winnerId);
-          const signed = round.deltas && focus ? round.deltas[focus.id] || 0 : 0;
-          main = round.kind === "den"
-            ? `${esc(focus ? displayName(focus) : "Ẩn")} đền ${esc(withUnit(formatPlain(Math.abs(signed))))}`
-            : round.kind === "chat"
-              ? `${esc(focus ? displayName(focus) : "Ẩn")} được ${esc(withUnit(formatPlain(signed)))}`
-              : `${esc(focus ? displayName(focus) : "Ẩn")} thắng ${esc(withUnit(formatSigned(signed)))}`;
-          details = round.parts.map((part) => {
-            const player = getPlayer(part.id);
-            return `${esc(player ? displayName(player) : "Ẩn")} ${esc(part.note)}`;
-          }).join(" · ");
-        } else {
-          const winner = getPlayer(round.winnerId);
-          const gain = Object.values(round.losses || {}).reduce((sum, amount) => sum + Number(amount), 0);
-          main = `${esc(winner ? displayName(winner) : "Ẩn")} thắng ${esc(withUnit(formatSigned(gain)))}`;
-          details = Object.entries(round.losses || {}).map(([id, amount]) => {
-            const player = getPlayer(id);
-            const name = esc(player ? displayName(player) : "Ẩn");
-            const cards = round.cards && round.cards[id];
-            return cards ? `${name} ${formatPlain(cards)} lá −${formatPlain(amount)}` : `${name} −${formatPlain(amount)}`;
-          }).join(" · ");
-        }
+      host.innerHTML = state.rounds.slice().reverse().map((round) => {
+        const time = new Date(round.at).toLocaleString("vi-VN", { hour: "2-digit", minute: "2-digit", day: "2-digit", month: "2-digit" });
+        const bits = state.players.filter((player) => round.deltas[player.id]).map((player) => player.name + " " + formatSigned(round.deltas[player.id]));
         return `
           <article class="round">
-            <div>
-              <p class="round-kicker">Ván ${count - index} · ${kindNote}${time}${rateNote}</p>
-              <p class="round-main">${main}</p>
-              <p class="round-sub">${details}</p>
+            <div class="round-top">
+              <strong>${esc(bits[0] || "Ván")}</strong>
+              <span class="when">${esc(time)}</span>
             </div>
-            <button type="button" class="btn btn-line-light" data-action="delete-round" data-id="${esc(round.id)}">Xóa</button>
+            <p>${esc(bits.join(" · "))}</p>
+            <button type="button" class="chip" data-drop="${round.id}">Xóa ván</button>
           </article>`;
       }).join("");
     }
 
-    function renderSettle() {
-      const host = document.getElementById("settleBody");
-      if (!state.rounds.length) {
-        host.innerHTML = '<p class="empty">Ghi ván xong, chỗ này sẽ chỉ ai trả ai.</p>';
-        return;
-      }
-      const balances = computeBalances();
-      const transfers = settle(balances);
-      const recap = state.players.map((player) => {
-        const amount = balances[player.id] || 0;
-        const tone = amount > 0 ? "pos" : amount < 0 ? "neg" : "zero";
-        return `<li><span class="dot" style="background:${player.color}"></span>${esc(displayName(player))}<strong class="${tone}">${esc(withUnit(formatSigned(amount)))}</strong></li>`;
-      }).join("");
-      const payments = transfers.length
-        ? `<ul class="pays">${transfers.map((item) => `<li><strong>${esc(item.from)}</strong> trả <strong>${esc(item.to)}</strong> ${esc(withUnit(formatPlain(item.amount)))}</li>`).join("")}</ul>`
-        : "<p>Sổ đã hòa, không ai phải trả.</p>";
-      host.innerHTML = `<ul class="recap">${recap}</ul>${payments}`;
+    function renderSummary() {
+      const totals = balances();
+      const rows = settle(totals);
+      const lines = state.players.map((player) => `<div class="sum-line"><span>${esc(player.name)}</span><strong class="${tone(totals[player.id])}">${formatSigned(totals[player.id])}</strong></div>`).join("");
+      const transfers = rows.length
+        ? rows.map((row) => `<div class="transfer"><span>${esc(row)}</span></div>`).join("")
+        : '<p class="empty">Sổ đang hòa.</p>';
+      document.getElementById("summary").innerHTML = lines + transfers;
     }
 
-    function renderSum() {
-      const total = Object.values(computeBalances()).reduce((sum, amount) => sum + amount, 0);
-      const node = document.getElementById("sumLine");
-      node.classList.toggle("bad", total !== 0);
-      node.textContent = total === 0
-        ? `${withUnit("Tổng mọi người: 0")} — sổ cân, vì tiền thắng lấy từ tiền thua.`
-        : `Tổng đang lệch ${withUnit(formatSigned(total))}.`;
-    }
-
-    function renderMeta() {
-      const count = state.players.length;
-      document.getElementById("tableLabel").textContent = `Bàn ${count} người`;
-      document.title = `Tính tiền · ${count} người`;
-    }
-
-    function paintPlayerNames() {
-      const winner = getPlayer(state.winnerId);
-      const banner = document.getElementById("winnerBanner");
-      if (winner && !banner.hidden) banner.textContent = bannerText(winner);
-      renderPreview();
-      renderHistory();
-      renderSettle();
-    }
-
-    function refreshAll(changedIds) {
-      const rate = document.getElementById("rate");
-      const unit = document.getElementById("unit");
-      if (rate && document.activeElement !== rate) rate.value = state.rate || "";
-      if (document.activeElement !== unit) unit.value = state.unit;
-      for (const [id, key] of Object.entries(PENALTY_FIELDS)) {
-        const field = document.getElementById(id);
-        if (field && document.activeElement !== field) field.value = state.penalties[key];
-      }
-      renderKinds();
-      renderBoard(changedIds);
-      renderLossRows();
-      renderPreview();
-      renderBoardDeltasOnly();
-      renderHistory();
-      renderSettle();
-      renderSum();
-      renderMeta();
-    }
-
-    function toast(message) {
-      const node = document.getElementById("toast");
-      node.textContent = message;
-      node.classList.add("show");
-      clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => node.classList.remove("show"), 2200);
-    }
-
-    function selectWinner(id) {
-      if (!getPlayer(id)) return;
-      state.winnerId = id;
-      if (state.victimId === id) state.victimId = null;
-      saveState();
+    function refresh() {
       renderBoard();
-      renderLossRows();
       renderPreview();
-      renderBoardDeltasOnly();
-      const composer = document.getElementById("composer");
-      if (composer.getBoundingClientRect().top > window.innerHeight * 0.55) {
-        composer.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
+      renderRounds();
+      renderSummary();
     }
 
-    function changedIds(before, after) {
-      return state.players.filter((player) => before[player.id] !== after[player.id]).map((player) => player.id);
-    }
-
-    function commitRound() {
-      const plan = buildPlan();
-      if (!plan.ok) return;
-      const before = computeBalances();
+    function commit() {
+      const current = plan();
+      if (!current.ok) return;
       state.rounds.push({
         id: uid(),
         at: Date.now(),
-        kind: plan.kind,
-        rate: plan.rate,
-        winnerId: plan.focus.id,
-        payerId: plan.payerId,
-        deltas: plan.deltas,
-        parts: plan.parts,
-        losses: {},
+        winnerId: current.winner ? current.winner.id : null,
+        deltas: current.deltas,
       });
-      clearDraft();
-      const after = computeBalances();
-      saveState();
-      refreshAll(changedIds(before, after));
-      toast(plan.title);
+      state.draft = {};
+      save();
+      refresh();
+      toast("Đã lưu ván");
     }
 
-    function setKind(kind) {
-      if (!KINDS.includes(kind)) return;
-      state.kind = kind;
-      state.victimId = null;
-      saveState();
-      renderBoard();
-      renderKinds();
-      renderLossRows();
-      renderPreview();
-      renderBoardDeltasOnly();
-    }
-
-    function undoLast() {
-      if (!state.rounds.length) return;
-      const before = computeBalances();
-      state.rounds.pop();
-      const after = computeBalances();
-      saveState();
-      refreshAll(changedIds(before, after));
-      toast("Đã hoàn tác ván vừa ghi");
-    }
-
-    function deleteRound(id) {
-      const index = state.rounds.findIndex((round) => round.id === id);
-      if (index < 0) return;
-      const before = computeBalances();
-      state.rounds.splice(index, 1);
-      const after = computeBalances();
-      saveState();
-      refreshAll(changedIds(before, after));
-      toast("Đã xóa ván");
-    }
-
-    function resetRounds() {
-      const before = computeBalances();
-      state.rounds = [];
-      state.winnerId = null;
-      clearDraft();
-      const after = computeBalances();
-      saveState();
-      refreshAll(changedIds(before, after));
-      toast("Đã xóa toàn bộ các ván");
-    }
-
-    function setRate(raw) {
-      const next = parseAmount(raw);
-      state.rate = next ? String(next) : "";
-      const input = document.getElementById("rate");
-      if (input && document.activeElement !== input) input.value = state.rate;
-      saveState();
-      renderPreview();
-      renderBoardDeltasOnly();
-    }
-
-    function addDraft(id, amount) {
-      const hand = handOf(id);
-      if (hand.cong) return;
-      const next = Math.min(10, parseCards(hand.cards) + amount);
-      hand.cards = next ? String(next) : "";
-      if (hand.heo > next) hand.heo = next;
-      state.draft[id] = hand;
-      saveState();
-      renderLossRows();
-      renderPreview();
-      renderBoardDeltasOnly();
-    }
-
-    function summaryText() {
-      const balances = computeBalances();
-      const lines = [`Sâm lốc ${state.players.length} người — ${state.rounds.length} ván`];
-      for (const player of state.players) lines.push(`${displayName(player)}: ${withUnit(formatSigned(balances[player.id]))}`);
-      const transfers = settle(balances);
-      lines.push("");
-      if (!state.rounds.length) lines.push("Chưa có ván.");
-      else if (!transfers.length) lines.push("Sổ hòa, không ai phải trả.");
-      else {
-        lines.push("Chốt sổ:");
-        for (const item of transfers) lines.push(`${item.from} trả ${item.to} ${withUnit(formatPlain(item.amount))}`);
+    document.getElementById("board").addEventListener("input", (event) => {
+      const nameId = event.target.dataset.name;
+      if (nameId) {
+        const player = state.players.find((item) => item.id === nameId);
+        if (!player) return;
+        player.name = event.target.value.slice(0, 24);
+        save();
+        renderPreview();
+        renderRounds();
+        renderSummary();
+        return;
       }
-      return lines.join("\n");
-    }
-
-    async function copySummary() {
+      const id = event.target.dataset.amt;
+      if (!id) return;
+      const clean = event.target.value.replace(/[^\d]/g, "").slice(0, 12);
+      if (clean !== event.target.value) event.target.value = clean;
+      const item = cell(id);
+      item.amt = clean;
+      state.draft[id] = item;
+      save();
+      renderPreview();
+    });
+    document.getElementById("board").addEventListener("focusout", (event) => {
+      const id = event.target.dataset && event.target.dataset.name;
+      if (!id) return;
+      const player = state.players.find((item) => item.id === id);
+      if (!player) return;
+      player.name = player.name.trim() || ("Người " + id.slice(1));
+      event.target.value = player.name;
+      save();
+      renderPreview();
+      renderRounds();
+      renderSummary();
+    });
+    document.getElementById("board").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-sign]");
+      if (!button) return;
+      const id = button.dataset.id;
+      const item = cell(id);
+      item.sign = item.sign === button.dataset.sign ? "" : button.dataset.sign;
+      state.draft[id] = item;
+      save();
+      document.querySelectorAll('[data-id="' + id + '"][data-sign]').forEach((node) => {
+        node.setAttribute("aria-pressed", node.dataset.sign === item.sign ? "true" : "false");
+      });
+      const row = button.closest(".row");
+      if (row) row.className = "row" + (item.sign ? " " + item.sign : "");
+      renderPreview();
+    });
+    document.getElementById("board").addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && event.target.dataset.amt) {
+        event.preventDefault();
+        commit();
+      }
+    });
+    document.getElementById("rounds").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-drop]");
+      if (!button) return;
+      pending = { type: "round", id: button.dataset.drop };
+      document.getElementById("askTitle").textContent = "Xóa ván này?";
+      document.getElementById("askText").textContent = "Tiền của ván sẽ trừ khỏi tổng kết.";
+      document.getElementById("ask").showModal();
+    });
+    document.getElementById("saveBtn").addEventListener("click", commit);
+    document.getElementById("copyBtn").addEventListener("click", async () => {
       const text = summaryText();
       try {
         await navigator.clipboard.writeText(text);
-      } catch {
-        const area = document.createElement("textarea");
-        area.value = text;
-        area.setAttribute("readonly", "");
-        area.style.position = "fixed";
-        area.style.left = "-999px";
-        document.body.appendChild(area);
-        area.select();
-        document.execCommand("copy");
-        area.remove();
+        toast("Đã chép tổng kết");
+      } catch (error) {
+        toast(text);
       }
-      toast("Đã chép kết quả");
-    }
+    });
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      pending = { type: "all" };
+      document.getElementById("askTitle").textContent = "Xóa hết các ván?";
+      document.getElementById("askText").textContent = "Tên bốn người vẫn được giữ.";
+      document.getElementById("ask").showModal();
+    });
+    document.getElementById("askNo").addEventListener("click", () => {
+      pending = null;
+      document.getElementById("ask").close();
+    });
+    document.getElementById("askYes").addEventListener("click", () => {
+      if (pending && pending.type === "round") state.rounds = state.rounds.filter((round) => round.id !== pending.id);
+      if (pending && pending.type === "all") state.rounds = [];
+      pending = null;
+      document.getElementById("ask").close();
+      save();
+      refresh();
+      toast("Đã xóa");
+    });
 
-    function bind() {
-      document.getElementById("board").addEventListener("click", (event) => {
-        const rename = event.target.closest('[data-action="rename"]');
-        if (rename) {
-          const input = document.querySelector(`.name[data-id="${rename.dataset.id}"]`);
-          if (input) {
-            input.focus();
-            input.select();
-          }
-          return;
-        }
-        const remove = event.target.closest('[data-action="remove-player"]');
-        if (remove) {
-          removePlayer(remove.dataset.id);
-          return;
-        }
-        if (event.target.closest("input")) return;
-        const card = event.target.closest(".player");
-        if (card) selectWinner(card.dataset.player);
-      });
-
-      document.getElementById("board").addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && event.target.classList.contains("name")) {
-          event.preventDefault();
-          event.target.blur();
-        }
-      });
-
-      document.getElementById("addPlayer").addEventListener("click", addPlayer);
-
-      document.getElementById("board").addEventListener("input", (event) => {
-        const input = event.target.closest(".name");
-        if (!input) return;
-        const player = getPlayer(input.dataset.id);
-        if (!player) return;
-        player.name = input.value.slice(0, 24);
-        saveState();
-        paintPlayerNames();
-      });
-
-      document.getElementById("board").addEventListener("focusout", (event) => {
-        const input = event.target.closest(".name");
-        if (!input) return;
-        const player = getPlayer(input.dataset.id);
-        if (!player) return;
-        const index = state.players.findIndex((item) => item.id === player.id);
-        player.name = player.name.trim().slice(0, 24) || defaultName(index);
-        input.value = player.name;
-        saveState();
-        setTimeout(paintPlayerNames, 0);
-      });
-
-      document.getElementById("lossRows").addEventListener("input", (event) => {
-        if (!event.target.classList.contains("amt")) return;
-        let clean = event.target.value.replace(/[^\d]/g, "").slice(0, 2);
-        if (Number(clean) > 10) clean = "10";
-        if (clean !== event.target.value) event.target.value = clean;
-        const hand = handOf(event.target.dataset.id);
-        hand.cards = clean;
-        const cards = parseCards(clean);
-        if (cards && hand.heo > cards) hand.heo = cards;
-        state.draft[event.target.dataset.id] = hand;
-        saveState();
-        renderPreview();
-        renderBoardDeltasOnly();
-      });
-
-      document.getElementById("lossRows").addEventListener("focusout", (event) => {
-        if (!event.target.classList.contains("amt")) return;
-        const hand = handOf(event.target.dataset.id);
-        const cards = parseCards(event.target.value);
-        hand.cards = cards ? String(cards) : "";
-        if (cards && hand.heo > cards) hand.heo = cards;
-        state.draft[event.target.dataset.id] = hand;
-        event.target.value = hand.cards;
-        saveState();
-        renderLossRows();
-        renderPreview();
-        renderBoardDeltasOnly();
-      });
-
-      document.getElementById("lossRows").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-action]");
-        if (!button) return;
-        const id = button.dataset.id;
-        if (button.dataset.action === "add") addDraft(id, Number(button.dataset.amt));
-        if (button.dataset.action === "clear") {
-          state.draft[id] = emptyHand();
-          saveState();
-          renderLossRows();
-          renderPreview();
-          renderBoardDeltasOnly();
-        }
-        if (button.dataset.action === "heo") {
-          const hand = handOf(id);
-          let heo = hand.heo + Number(button.dataset.dir);
-          const cap = hand.cong ? 4 : Math.min(4, parseCards(hand.cards));
-          if (heo < 0) heo = 0;
-          if (heo > cap) heo = cap;
-          hand.heo = heo;
-          state.draft[id] = hand;
-          saveState();
-          renderLossRows();
-          renderPreview();
-          renderBoardDeltasOnly();
-        }
-        if (button.dataset.action === "cong") {
-          const hand = handOf(id);
-          hand.cong = !hand.cong;
-          state.draft[id] = normalizeHand(hand);
-          saveState();
-          renderLossRows();
-          renderPreview();
-          renderBoardDeltasOnly();
-        }
-        if (button.dataset.action === "tuquy") {
-          const hand = handOf(id);
-          hand.tuQuy = (hand.tuQuy + 1) % 3;
-          state.draft[id] = hand;
-          saveState();
-          renderLossRows();
-          renderPreview();
-          renderBoardDeltasOnly();
-        }
-        if (button.dataset.action === "victim") {
-          state.victimId = state.victimId === id ? null : id;
-          saveState();
-          renderLossRows();
-          renderPreview();
-          renderBoardDeltasOnly();
-        }
-      });
-
-      document.getElementById("kinds").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-kind]");
-        if (button) setKind(button.dataset.kind);
-      });
-
-      document.getElementById("penaltyBox").addEventListener("input", (event) => {
-        const key = PENALTY_FIELDS[event.target.id];
-        if (!key) return;
-        const clean = event.target.value.replace(/[^\d]/g, "").slice(0, 2);
-        if (clean !== event.target.value) event.target.value = clean;
-        state.penalties[key] = clean === "" ? 0 : Math.min(99, Number(clean));
-        saveState();
-        renderLossRows();
-        renderPreview();
-        renderBoardDeltasOnly();
-      });
-
-      document.getElementById("lossRows").addEventListener("keydown", (event) => {
-        if (event.key === "Enter" && event.target.classList.contains("amt")) {
-          event.preventDefault();
-          commitRound();
-        }
-      });
-
-      document.getElementById("rate").addEventListener("input", (event) => {
-        const clean = event.target.value.replace(/[^\d.,]/g, "").slice(0, 15);
-        if (clean !== event.target.value) event.target.value = clean;
-        state.rate = clean;
-        saveState();
-        renderPreview();
-        renderBoardDeltasOnly();
-      });
-
-      document.getElementById("rate").addEventListener("focusout", (event) => {
-        const next = parseAmount(event.target.value);
-        state.rate = next ? String(next) : "";
-        event.target.value = state.rate;
-        saveState();
-        renderPreview();
-        renderBoardDeltasOnly();
-      });
-
-      document.getElementById("rate").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          event.target.blur();
-        }
-      });
-
-      document.getElementById("rateChips").addEventListener("click", (event) => {
-        const button = event.target.closest("[data-rate]");
-        if (!button) return;
-        setRate(button.dataset.rate);
-        document.getElementById("rate").value = state.rate;
-      });
-      document.getElementById("commitBtn").addEventListener("click", commitRound);
-      document.getElementById("undoBtn").addEventListener("click", undoLast);
-      document.getElementById("history").addEventListener("click", (event) => {
-        const button = event.target.closest('[data-action="delete-round"]');
-        if (button) deleteRound(button.dataset.id);
-      });
-      document.getElementById("resetBtn").addEventListener("click", () => {
-        document.getElementById("resetDialog").showModal();
-      });
-      document.getElementById("resetDialog").addEventListener("close", (event) => {
-        if (event.target.returnValue === "ok") resetRounds();
-      });
-      document.getElementById("copyBtn").addEventListener("click", copySummary);
-      document.getElementById("unit").addEventListener("input", (event) => {
-        const clean = event.target.value.replace(/[<>]/g, "").slice(0, 8);
-        if (clean !== event.target.value) event.target.value = clean;
-        state.unit = clean;
-        saveState();
-        renderBoard();
-        renderLossRows();
-        renderPreview();
-        renderHistory();
-        renderSettle();
-        renderSum();
-      });
-      document.getElementById("unit").addEventListener("focusout", () => {
-        state.unit = state.unit.trim();
-        saveState();
-        setTimeout(() => refreshAll(), 0);
-      });
-      document.addEventListener("keydown", (event) => {
-        if (event.target.closest("input, textarea, dialog")) return;
-        if (event.metaKey || event.ctrlKey || event.altKey) return;
-        if (event.key < "1" || event.key > "9") return;
-        const player = state.players[Number(event.key) - 1];
-        if (!player) return;
-        event.preventDefault();
-        selectWinner(player.id);
-      });
-    }
-
-    bind();
-    refreshAll();
+    refresh();
   </script>
 </body>
 </html>
